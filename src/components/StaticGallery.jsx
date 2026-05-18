@@ -158,7 +158,7 @@ export default function StaticGallery() {
           </button>
           {/* GitHub Repo Icon (circle) */}
           <a
-            href="https://github.com/bimal1412/cct-memes"
+            href="https://github.com/833M0L3/cct-memes"
             target="_blank"
             rel="noopener noreferrer"
             className={"p-2 rounded-full transition-colors ml-1 flex items-center justify-center " + (isDark ? 'bg-[#23272b] hover:bg-[#30363d] text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-800')}
@@ -258,11 +258,10 @@ export default function StaticGallery() {
                         </div>
                       </>
                     ) : (
-                      <img
+                      <LazyImage
                         src={`${import.meta.env.BASE_URL}memes/${encodeURIComponent(file)}`}
                         alt={file}
                         className="w-full h-full object-cover"
-                        loading="lazy"
                       />
                     )}
                     
@@ -401,5 +400,39 @@ export default function StaticGallery() {
         </div>
       )}
     </div>
+  );
+}
+
+// LazyImage component using Intersection Observer
+function LazyImage({ src, alt, className }) {
+  const [isVisible, setIsVisible] = React.useState(false);
+  const imgRef = React.useRef();
+
+  React.useEffect(() => {
+    let observer;
+    if (imgRef.current && !isVisible) {
+      observer = new window.IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+            observer.disconnect();
+          }
+        },
+        { rootMargin: '200px' }
+      );
+      observer.observe(imgRef.current);
+    }
+    return () => observer && observer.disconnect();
+  }, [isVisible]);
+
+  return (
+    <img
+      ref={imgRef}
+      src={isVisible ? src : undefined}
+      alt={alt}
+      className={className}
+      style={{ background: '#e0e0e0', minHeight: '100%', minWidth: '100%' }}
+      loading="lazy"
+    />
   );
 }
