@@ -3,13 +3,24 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { MEME_FILES } from "../memesList";
 import { 
   Menu, Search, CheckCircle2, PlayCircle,
-  ChevronLeft, ChevronRight, X, Image as ImageIcon, Info
+  ChevronLeft, ChevronRight, X, Image as ImageIcon, Info, Github
 } from "lucide-react";
+
+// Dark mode hook
+function useDarkMode() {
+  // Default to light mode
+  const [isDark, setIsDark] = useState(false);
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDark);
+  }, [isDark]);
+  return [isDark, setIsDark];
+}
 
 // Helper to determine if a filename is a video
 const isVideo = (filename) => /\.mp4$/i.test(filename);
 
 export default function StaticGallery() {
+  const [isDark, setIsDark] = useDarkMode();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const [touchStart, setTouchStart] = useState(null);
@@ -86,9 +97,9 @@ export default function StaticGallery() {
   }, [selectedFile, showNext, showPrev]);
 
   return (
-    <div className="min-h-screen bg-white text-[#3c4043] font-sans">
+    <div className={"min-h-screen font-sans transition-colors duration-300 " + (isDark ? 'bg-[#181a1b] text-[#e3e3e3]' : 'bg-white text-[#3c4043]') }>
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white flex items-center justify-between px-4 py-2 border-b border-transparent transition-shadow duration-300">
+      <header className={"sticky top-0 z-50 flex items-center justify-between px-4 py-2 border-b border-transparent transition-shadow duration-300 " + (isDark ? 'bg-[#181a1b]' : 'bg-white') }>
         <div className="flex items-center gap-4">
           <button 
             className="p-3 hover:bg-gray-100 rounded-full text-gray-600 transition-colors"
@@ -96,17 +107,21 @@ export default function StaticGallery() {
           >
             <Menu size={24} />
           </button>
-          <div className="flex items-center gap-2 cursor-pointer pr-4">
+          <div
+            className="flex items-center gap-2 cursor-pointer pr-4"
+            onClick={() => setActiveTab('photos')}
+            title="Go to Home"
+          >
             {/* Google Photos Icon Mock */}
-            <div className="w-10 h-10 relative flex items-center justify-center">
-              <svg viewBox="0 0 40 40" className="w-10 h-10">
+            <div className="relative flex items-center justify-center" style={{ width: '2.2rem', height: '2.2rem', minWidth: '1.8rem', minHeight: '1.8rem', maxWidth: '2.5rem', maxHeight: '2.5rem' }}>
+              <svg viewBox="0 0 40 40" className="w-full h-full">
                 <path d="M20,20 L20,0 C9,0 0,9 0,20 Z" fill="#EA4335" />
                 <path d="M20,20 L40,20 C40,9 31,0 20,0 Z" fill="#4285F4" />
                 <path d="M20,20 L20,40 C31,40 40,31 40,20 Z" fill="#34A853" />
                 <path d="M20,20 L0,20 C0,31 9,40 20,40 Z" fill="#FBBC05" />
               </svg>
             </div>
-            <span className="text-[22px] text-[#5f6368] tracking-[-0.5px] font-medium" style={{ fontFamily: "'Product Sans', Arial, sans-serif" }}>
+            <span className="text-[20px] sm:text-[22px] text-[#5f6368] dark:text-[#e3e3e3] tracking-[-0.5px] font-medium" style={{ fontFamily: "'Product Sans', Arial, sans-serif" }}>
               CCT Memories
             </span>
           </div>
@@ -128,13 +143,44 @@ export default function StaticGallery() {
 
         {/* Profile Icon */}
         <div className="flex items-center gap-2">
-          <button className="p-1 hover:bg-gray-100 rounded-full transition-colors ml-2">
+          {/* Dark/Light Mode Toggle */}
+          <button
+            className={"p-2 rounded-full transition-colors focus:outline-none " + (isDark ? 'bg-[#23272b] text-yellow-300' : 'bg-gray-100 text-gray-700 hover:bg-gray-200')}
+            title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            onClick={() => setIsDark(!isDark)}
+            aria-label="Toggle dark mode"
+          >
+            {isDark ? (
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z" fill="currentColor"/></svg>
+            ) : (
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" stroke="currentColor" strokeWidth="2"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" strokeWidth="2"/></svg>
+            )}
+          </button>
+          {/* GitHub Repo Icon (circle) */}
+          <a
+            href="https://github.com/bimal1412/cct-memes"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={"p-2 rounded-full transition-colors ml-1 flex items-center justify-center " + (isDark ? 'bg-[#23272b] hover:bg-[#30363d] text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-800')}
+            title="View GitHub Repo"
+            style={{ width: 36, height: 36 }}
+          >
+            <Github size={20} />
+          </a>
+          {/* Profile Icon */}
+          <a
+            href="https://github.com/bimal1412"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={"p-1 rounded-full transition-colors ml-2 " + (isDark ? 'hover:bg-[#23272b]' : 'hover:bg-gray-100')}
+            title="Go to GitHub Profile"
+          >
             <img 
               src="https://avatars.githubusercontent.com/u/59522309?v=4" 
               alt="Profile" 
               className="w-8 h-8 rounded-full border border-gray-200 object-cover shadow-sm"
             />
-          </button>
+          </a>
         </div>
       </header>
 

@@ -16,12 +16,19 @@
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 
+
 body {
   background: var(--cream);
   color: var(--ink);
   font-family: 'DM Sans', sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  transition: background 0.3s, color 0.3s;
+}
+
+html.dark body {
+  background: #181a1b;
+  color: #e3e3e3;
 }
 
 body::after {
