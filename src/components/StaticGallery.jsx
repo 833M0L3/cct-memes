@@ -213,18 +213,13 @@ export default function StaticGallery() {
 
       {/* ── Permanent sidebar (desktop only, always visible) ─────────── */}
       <aside className={"hidden md:flex fixed inset-y-0 left-0 z-40 flex-col w-64 border-r " + (isDark ? 'bg-[#181a1b] border-[#2a2d2e]' : 'bg-white border-[#e8eaed]')}>
-        {/* Sidebar header — same height as main header so they align */}
-        <div className={"flex items-center gap-2 px-4 h-[57px] border-b flex-shrink-0 " + (isDark ? 'border-[#2a2d2e]' : 'border-[#e8eaed]')}>
-          <svg viewBox="0 0 40 40" style={{width:'1.8rem',height:'1.8rem',flexShrink:0}}>
-            <path d="M20,20 L20,0 C9,0 0,9 0,20 Z" fill="#EA4335" />
-            <path d="M20,20 L40,20 C40,9 31,0 20,0 Z" fill="#4285F4" />
-            <path d="M20,20 L20,40 C31,40 40,31 40,20 Z" fill="#34A853" />
-            <path d="M20,20 L0,20 C0,31 9,40 20,40 Z" fill="#FBBC05" />
-          </svg>
-          <span className={"text-[18px] font-medium tracking-[-0.3px] " + (isDark ? 'text-[#e3e3e3]' : 'text-[#5f6368]')} style={{fontFamily:"'Product Sans',Arial,sans-serif"}}>CCT Memories</span>
-        </div>
+        {/* Sidebar header — removed logo and title for cleaner look */}
+        <div className={"px-4 h-[16px] border-b flex-shrink-0 " + (isDark ? 'border-[#2a2d2e]' : 'border-[#e8eaed]')}></div>
         {/* Nav items */}
-        <div className="flex flex-col gap-0.5 flex-1 pt-2 overflow-y-auto">
+        <div
+          className="flex flex-col gap-0.5 flex-1 overflow-y-auto"
+          style={{ paddingTop: 'var(--sidebar-nav-top, 57px)' }}
+        >
           {[
             { id: 'photos', label: 'Memes' },
             { id: 'screenshots', label: 'Screenshot Memories' },
@@ -332,7 +327,7 @@ export default function StaticGallery() {
               </div>
 
               {/* Grid Layout (Dense, square aspect ratios) */}
-              <div key={activeTab} className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 gap-1 mt-2">
+              <div key={activeTab} className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 mt-2">
                 {albumFiles.map((file) => (
                   <div 
                     key={file} 
@@ -398,18 +393,21 @@ export default function StaticGallery() {
                 `w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 ` +
                 (isDark ? 'text-[#e3e3e3]' : 'text-[#3c4043]')
               }>
-                <div className="flex flex-col items-center mb-8">
-                  <div className="w-16 h-16 relative flex items-center justify-center mb-4">
-                    <svg viewBox="0 0 40 40" className="w-16 h-16 drop-shadow-sm">
-                      <path d="M20,20 L20,0 C9,0 0,9 0,20 Z" fill="#EA4335" />
-                      <path d="M20,20 L40,20 C40,9 31,0 20,0 Z" fill="#4285F4" />
-                      <path d="M20,20 L20,40 C31,40 40,31 40,20 Z" fill="#34A853" />
-                      <path d="M20,20 L0,20 C0,31 9,40 20,40 Z" fill="#FBBC05" />
-                    </svg>
+                {/* Video Montage */}
+                <div className="flex flex-col items-center mb-8 w-full">
+                  <div className="w-full max-w-2xl aspect-video rounded-2xl overflow-hidden shadow-lg border border-[#e8eaed] dark:border-[#23272b] relative bg-black">
+                    <video
+                      src={import.meta.env.BASE_URL + 'cct.mp4'}
+                      autoPlay
+                      loop
+                      controls={false}
+                      muted={false}
+                      className="w-full h-full object-cover"
+                      style={{ minHeight: 280, background: 'transparent' }}
+                    />
+                    {/* Custom overlay for blending effect */}
+                    <div className="absolute inset-0 pointer-events-none rounded-2xl" style={{background: isDark ? 'linear-gradient(180deg,rgba(24,26,27,0.10) 0%,rgba(24,26,27,0.18) 100%)' : 'linear-gradient(180deg,rgba(255,255,255,0.07) 0%,rgba(241,243,244,0.13) 100%)'}} />
                   </div>
-                  <h1 className={"text-2xl sm:text-3xl font-medium text-center " + (isDark ? 'text-[#8ab4f8]' : 'text-[#1a73e8]')} style={{ fontFamily: "'Product Sans', Arial, sans-serif" }}>
-                    CCT Memories
-                  </h1>
                 </div>
                 <div className="space-y-6 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto">
                   <p>

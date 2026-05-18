@@ -1,3 +1,12 @@
+/* Responsive sidebar nav top padding to match header height */
+:root {
+  --sidebar-nav-top: 57px;
+}
+@media (max-width: 768px) {
+  :root {
+    --sidebar-nav-top: 0px;
+  }
+}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
