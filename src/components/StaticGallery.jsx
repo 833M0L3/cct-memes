@@ -61,8 +61,10 @@ export default function StaticGallery() {
   }, [selectedFile, albumFiles]);
 
   const onTouchStart = (e) => {
-    if (e.touches.length > 1) {
+    // If zoomed in or multi-touch (pinch), let TransformWrapper handle it
+    if (e.touches.length > 1 || zoomScale > 1.05) {
       setTouchStart(null);
+      setTouchEnd(null);
       return;
     }
     setTouchEnd(null);
@@ -70,7 +72,7 @@ export default function StaticGallery() {
   };
 
   const onTouchMove = (e) => {
-    if (e.touches.length > 1) return;
+    if (e.touches.length > 1 || !touchStart) return;
     setTouchEnd(e.targetTouches[0].clientX);
   };
 
