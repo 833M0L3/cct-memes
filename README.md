@@ -1,4 +1,4 @@
-# CCT Batch 2021 Memes
+# CCT Archives
 
 This is the webpage made to preserve memories of Bimal during his bachelor's undergraduate days attending computer science in CCT college.
 
