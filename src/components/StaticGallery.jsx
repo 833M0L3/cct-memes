@@ -176,7 +176,7 @@ export default function StaticGallery() {
           </a>
           {/* Profile avatar */}
           <a
-            href="https://github.com/bimal1412"
+            href="https://github.com/833M0L3"
             target="_blank"
             rel="noopener noreferrer"
             className="p-0.5 rounded-full ml-1"
@@ -257,14 +257,20 @@ export default function StaticGallery() {
       </aside>
 
       {/* ── Mobile drawer sidebar (overlay, only on small screens) ─────── */}
+      {/* Overlay — only shown when open */}
       {isSidebarOpen && (
-        <>
-          <div
-            className="fixed inset-0 z-[199] bg-black/30"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-          <aside className={"md:hidden fixed inset-y-0 left-0 z-[200] flex flex-col shadow-2xl h-full w-72 sm:w-80 transition-transform duration-300 " + (isDark ? 'bg-[#202124]' : 'bg-white')}>
-            {/* Close button for sidebar (mobile/desktop) */}
+        <div
+          className="md:hidden fixed inset-0 z-[199] bg-black/30"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+      {/* Drawer — always in DOM, slides in/out via transform */}
+      <aside
+        className={"md:hidden fixed inset-y-0 left-0 z-[200] flex flex-col shadow-2xl h-full w-72 sm:w-80 transition-transform duration-300 ease-in-out " +
+          (isDark ? 'bg-[#202124]' : 'bg-white') + " " +
+          (isSidebarOpen ? 'translate-x-0' : '-translate-x-full')
+        }>
+            {/* Close button for sidebar */}
             <button
               className={"absolute top-3 right-3 p-2 rounded-full transition-colors " + (isDark ? 'hover:bg-[#2a2d2e] text-[#9aa0a6]' : 'hover:bg-[#f1f3f4] text-[#5f6368]')}
               onClick={() => setIsSidebarOpen(false)}
@@ -308,9 +314,7 @@ export default function StaticGallery() {
                 <span className={`text-[14px] ${activeTab === 'about' ? 'font-medium' : 'font-normal'}`}>About</span>
               </div>
             </div>
-          </aside>
-        </>
-      )}
+      </aside>
 
       {/* Content area — offset on desktop to sit beside the permanent sidebar */}
       <div className="md:ml-64 flex min-h-[calc(100vh-56px)] overflow-hidden">
@@ -326,10 +330,10 @@ export default function StaticGallery() {
               </div>
 
               {/* Grid Layout (Dense, square aspect ratios) */}
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 gap-1 mt-2">
-                {albumFiles.map((file, idx) => (
+              <div key={activeTab} className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 gap-1 mt-2">
+                {albumFiles.map((file) => (
                   <div 
-                    key={idx} 
+                    key={file} 
                     className="group relative bg-[#f1f3f4] overflow-hidden cursor-pointer"
                     style={{ aspectRatio: "1 / 1" }}
                     onClick={() => setSelectedFile(file)}
@@ -401,7 +405,7 @@ export default function StaticGallery() {
                       <path d="M20,20 L0,20 C0,31 9,40 20,40 Z" fill="#FBBC05" />
                     </svg>
                   </div>
-                  <h1 className="text-2xl sm:text-3xl font-medium text-center text-[#1a73e8] dark:text-[#8ab4f8]" style={{ fontFamily: "'Product Sans', Arial, sans-serif" }}>
+                  <h1 className={"text-2xl sm:text-3xl font-medium text-center " + (isDark ? 'text-[#8ab4f8]' : 'text-[#1a73e8]')} style={{ fontFamily: "'Product Sans', Arial, sans-serif" }}>
                     CCT Memories
                   </h1>
                 </div>
@@ -506,9 +510,10 @@ export default function StaticGallery() {
   );
 }
 
-// LazyImage component using Intersection Observer
+// LazyImage component with shimmer skeleton + fade-in on load
 function LazyImage({ src, alt, className }) {
   const [isVisible, setIsVisible] = React.useState(false);
+  const [isLoaded, setIsLoaded] = React.useState(false);
   const imgRef = React.useRef();
 
   React.useEffect(() => {
@@ -529,13 +534,26 @@ function LazyImage({ src, alt, className }) {
   }, [isVisible]);
 
   return (
-    <img
-      ref={imgRef}
-      src={isVisible ? src : undefined}
-      alt={alt}
-      className={className}
-      style={{ background: '#e0e0e0', minHeight: '100%', minWidth: '100%' }}
-      loading="lazy"
-    />
+    <div ref={imgRef} className="relative w-full h-full">
+      {/* Shimmer skeleton shown until image fully loads */}
+      {!isLoaded && (
+        <div className="skeleton absolute inset-0" />
+      )}
+      <img
+        src={isVisible ? src : undefined}
+        alt={alt}
+        className={className}
+        style={{
+          opacity: isLoaded ? 1 : 0,
+          transition: 'opacity 0.3s ease',
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+        }}
+        onLoad={() => setIsLoaded(true)}
+        loading="lazy"
+      />
+    </div>
   );
 }
