@@ -173,11 +173,11 @@ export default function StaticGallery() {
 
       <div className="flex h-[calc(100vh-64px)] overflow-hidden">
         {/* Main Content */}
-        <main className="flex-1 overflow-y-auto pt-2 px-4 sm:px-6 lg:px-8 pb-20 relative" id="scroll-container">
+        <main className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 pb-20 relative" id="scroll-container">
           {activeTab === 'photos' ? (
             <>
               {/* Group Header */}
-              <div className="sticky top-0 bg-white/95 backdrop-blur-sm z-10 py-3 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 flex items-center justify-between">
+              <div className="sticky top-0 bg-white/95 backdrop-blur-sm z-10 pt-4 pb-3 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 flex items-center justify-between">
                 <h2 className="text-[15px] font-medium text-[#3c4043]">CCT Batch 2021</h2>
                 <div className="text-[13px] text-[#5f6368]">
                    {filteredFiles.length} items
@@ -238,30 +238,33 @@ export default function StaticGallery() {
               )}
             </>
           ) : (
-            <div className="max-w-2xl mx-auto mt-8 p-6 sm:p-8 bg-white border border-gray-200 rounded-2xl shadow-sm">
-              <div className="flex justify-center mb-6">
-                <div className="w-16 h-16 relative flex items-center justify-center">
-                  <svg viewBox="0 0 40 40" className="w-16 h-16">
-                    <path d="M20,20 L20,0 C9,0 0,9 0,20 Z" fill="#EA4335" />
-                    <path d="M20,20 L40,20 C40,9 31,0 20,0 Z" fill="#4285F4" />
-                    <path d="M20,20 L20,40 C31,40 40,31 40,20 Z" fill="#34A853" />
-                    <path d="M20,20 L0,20 C0,31 9,40 20,40 Z" fill="#FBBC05" />
-                  </svg>
+            <div className="min-h-full w-full flex flex-col items-center justify-center p-4 sm:p-8 lg:p-12">
+              <div className="max-w-3xl w-full bg-white border border-gray-200 rounded-3xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden">
+                <div className="bg-[#f8f9fa] border-b border-gray-100 p-8 sm:p-12 flex flex-col items-center justify-center">
+                  <div className="w-20 h-20 relative flex items-center justify-center mb-6">
+                    <svg viewBox="0 0 40 40" className="w-20 h-20 drop-shadow-sm">
+                      <path d="M20,20 L20,0 C9,0 0,9 0,20 Z" fill="#EA4335" />
+                      <path d="M20,20 L40,20 C40,9 31,0 20,0 Z" fill="#4285F4" />
+                      <path d="M20,20 L20,40 C31,40 40,31 40,20 Z" fill="#34A853" />
+                      <path d="M20,20 L0,20 C0,31 9,40 20,40 Z" fill="#FBBC05" />
+                    </svg>
+                  </div>
+                  <h1 className="text-3xl sm:text-4xl font-medium text-center text-[#1a73e8]" style={{ fontFamily: "'Product Sans', Arial, sans-serif" }}>
+                    About CCT Memories
+                  </h1>
                 </div>
-              </div>
-              <h1 className="text-2xl font-medium text-center text-[#1a73e8] mb-6" style={{ fontFamily: "'Product Sans', Arial, sans-serif" }}>
-                About CCT Memories
-              </h1>
-              <div className="text-[#3c4043] space-y-5 leading-relaxed text-[15px]">
-                <p>
-                  This is the webpage made to preserve memories of Bimal Dhital during his time attending CCT college BSc CSIT course.
-                </p>
-                <p>
-                  Throughout the years from 2021 onwards, Bimal and the entire Batch of 2021 have shared countless moments of joy, late-night coding sessions, exam struggles, and unforgettable hostel life. This gallery serves as a nostalgic archive, a time capsule of those chaotic but beautiful college days at Central Campus of Technology.
-                </p>
-                <p>
-                  From surviving rigorous lab assignments to the spontaneous inside jokes shared among friends, every meme and photo here holds a story. Feel free to browse, laugh, and reminisce about the good old days.
-                </p>
+                
+                <div className="p-8 sm:p-12 text-[#3c4043] space-y-6 text-base sm:text-lg leading-relaxed">
+                  <p>
+                    This is the webpage made to preserve memories of Bimal Dhital during his time attending CCT college BSc CSIT course.
+                  </p>
+                  <p>
+                    Throughout the years from 2021 onwards, Bimal and the entire Batch of 2021 have shared countless moments of joy, late-night coding sessions, exam struggles, and unforgettable latenight discord call sessions. This gallery serves as a nostalgic archive, a time capsule of those chaotic but beautiful college days at Central Campus of Technology.
+                  </p>
+                  <p>
+                    From surviving rigorous lab assignments to the spontaneous inside jokes shared among friends, every meme and photo here holds a story. Feel free to browse, laugh, and reminisce about the good old days.
+                  </p>
+                </div>
               </div>
             </div>
           )}
