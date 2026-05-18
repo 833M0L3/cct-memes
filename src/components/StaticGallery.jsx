@@ -223,9 +223,12 @@ export default function StaticGallery() {
           {activeTab === 'photos' ? (
             <>
               {/* Group Header */}
-              <div className="sticky top-0 bg-white/95 backdrop-blur-sm z-10 pt-4 pb-3 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 flex items-center justify-between">
-                <h2 className="text-[15px] font-medium text-[#3c4043]">CCT Batch 2021</h2>
-                <div className="text-[13px] text-[#5f6368]">
+              <div className={
+                `sticky top-0 backdrop-blur-sm z-10 pt-4 pb-3 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 flex items-center justify-between ` +
+                (isDark ? 'bg-[#23272b]/95' : 'bg-white/95')
+              }>
+                <h2 className={"text-[15px] font-medium " + (isDark ? 'text-[#e3e3e3]' : 'text-[#3c4043]')}>CCT Batch 2021</h2>
+                <div className={"text-[13px] " + (isDark ? 'text-[#b0b0b0]' : 'text-[#5f6368]')}>
                    {filteredFiles.length} items
                 </div>
               </div>
