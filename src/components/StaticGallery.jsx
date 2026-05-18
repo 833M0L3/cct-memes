@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import { MEME_FILES } from "../memesList";
+import { SCREENSHOT_FILES } from "../screenshotsList";
 import { 
   Menu, Search, CheckCircle2, PlayCircle,
   ChevronLeft, ChevronRight, X, Image as ImageIcon, Info, Github
@@ -19,6 +20,7 @@ function useDarkMode() {
 // Helper to determine if a filename is a video
 const isVideo = (filename) => /\.mp4$/i.test(filename);
 
+
 export default function StaticGallery() {
   const [isDark, setIsDark] = useDarkMode();
   const [searchQuery, setSearchQuery] = useState("");
@@ -30,9 +32,13 @@ export default function StaticGallery() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('photos');
 
-  const filteredFiles = MEME_FILES.filter(file => 
-    file.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+
+  // Album selection: 'photos' or 'screenshots'
+  const albumFiles = activeTab === 'photos'
+    ? MEME_FILES.filter(file => file.toLowerCase().includes(searchQuery.toLowerCase()))
+    : activeTab === 'screenshots'
+      ? SCREENSHOT_FILES.filter(file => file.toLowerCase().includes(searchQuery.toLowerCase()))
+      : [];
 
   const closeLightbox = () => setSelectedFile(null);
 
@@ -40,19 +46,19 @@ export default function StaticGallery() {
     if (e) e.stopPropagation();
     if (!selectedFile) return;
     setSlideDirection('right');
-    const currentIndex = filteredFiles.indexOf(selectedFile);
-    const nextIndex = (currentIndex + 1) % filteredFiles.length;
-    setSelectedFile(filteredFiles[nextIndex]);
-  }, [selectedFile, filteredFiles]);
+    const currentIndex = albumFiles.indexOf(selectedFile);
+    const nextIndex = (currentIndex + 1) % albumFiles.length;
+    setSelectedFile(albumFiles[nextIndex]);
+  }, [selectedFile, albumFiles]);
 
   const showPrev = useCallback((e) => {
     if (e) e.stopPropagation();
     if (!selectedFile) return;
     setSlideDirection('left');
-    const currentIndex = filteredFiles.indexOf(selectedFile);
-    const prevIndex = (currentIndex - 1 + filteredFiles.length) % filteredFiles.length;
-    setSelectedFile(filteredFiles[prevIndex]);
-  }, [selectedFile, filteredFiles]);
+    const currentIndex = albumFiles.indexOf(selectedFile);
+    const prevIndex = (currentIndex - 1 + albumFiles.length) % albumFiles.length;
+    setSelectedFile(albumFiles[prevIndex]);
+  }, [selectedFile, albumFiles]);
 
   const onTouchStart = (e) => {
     if (e.touches.length > 1) {
@@ -99,13 +105,15 @@ export default function StaticGallery() {
   return (
     <div className={"min-h-screen font-sans transition-colors duration-300 " + (isDark ? 'bg-[#181a1b] text-[#e3e3e3]' : 'bg-white text-[#3c4043]') }>
       {/* Header */}
-      <header className={"sticky top-0 z-50 flex items-center justify-between px-4 py-2 border-b border-transparent transition-shadow duration-300 " + (isDark ? 'bg-[#181a1b]' : 'bg-white') }>
-        <div className="flex items-center gap-4">
+      <header className={"sticky top-0 z-50 flex items-center justify-between px-2 sm:px-4 py-2 border-b transition-shadow duration-300 " + (isDark ? 'bg-[#181a1b] border-[#2a2d2e] shadow-[0_1px_3px_rgba(0,0,0,0.4)]' : 'bg-white border-[#e8eaed] shadow-[0_1px_3px_rgba(60,64,67,0.15)]') }>
+        <div className="flex items-center gap-1 sm:gap-2">
+          {/* Hamburger — mobile only */}
           <button 
-            className="p-3 hover:bg-gray-100 rounded-full text-gray-600 transition-colors"
+            className={"md:hidden p-2 sm:p-3 rounded-full transition-colors " + (isDark ? 'hover:bg-[#2a2d2e] text-[#e3e3e3]' : 'hover:bg-[#f1f3f4] text-[#5f6368]')}
             onClick={() => setIsSidebarOpen(true)}
+            aria-label="Open menu"
           >
-            <Menu size={24} />
+            <Menu size={22} />
           </button>
           <div
             className="flex items-center gap-2 cursor-pointer pr-4"
@@ -121,31 +129,31 @@ export default function StaticGallery() {
                 <path d="M20,20 L0,20 C0,31 9,40 20,40 Z" fill="#FBBC05" />
               </svg>
             </div>
-            <span className="text-[20px] sm:text-[22px] text-[#5f6368] dark:text-[#e3e3e3] tracking-[-0.5px] font-medium" style={{ fontFamily: "'Product Sans', Arial, sans-serif" }}>
+            <span className={"text-[16px] sm:text-[20px] tracking-[-0.5px] font-medium " + (isDark ? 'text-[#e3e3e3]' : 'text-[#5f6368]')} style={{ fontFamily: "'Product Sans', Arial, sans-serif" }}>
               CCT Memories
             </span>
           </div>
         </div>
 
-        {/* Search Bar */}
-        <div className="hidden md:flex flex-1 max-w-[720px] mx-8 relative">
+        {/* Search Bar — desktop only */}
+        <div className="hidden md:flex flex-1 max-w-[640px] mx-4 lg:mx-8 relative">
           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-            <Search className="text-[#5f6368]" size={20} />
+            <Search className="text-[#5f6368]" size={18} />
           </div>
           <input
             type="text"
             placeholder="Search your photos"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#f1f3f4] text-[#3c4043] rounded-lg py-3 pl-12 pr-4 focus:outline-none focus:bg-white focus:shadow-[0_1px_1px_0_rgba(65,69,73,0.3),0_1px_3px_1px_rgba(65,69,73,0.15)] transition-all placeholder-[#5f6368]"
+            className={"w-full rounded-full py-2 pl-11 pr-4 text-sm focus:outline-none transition-all " + (isDark ? 'bg-[#2a2d2e] text-[#e3e3e3] placeholder-[#9aa0a6] focus:bg-[#35373a]' : 'bg-[#f1f3f4] text-[#3c4043] placeholder-[#5f6368] focus:bg-white focus:shadow-[0_1px_1px_0_rgba(65,69,73,0.3),0_1px_3px_1px_rgba(65,69,73,0.15)]')}
           />
         </div>
 
-        {/* Profile Icon */}
-        <div className="flex items-center gap-2">
+        {/* Right actions */}
+        <div className="flex items-center gap-1">
           {/* Dark/Light Mode Toggle */}
           <button
-            className={"p-2 rounded-full transition-colors focus:outline-none " + (isDark ? 'bg-[#23272b] text-yellow-300' : 'bg-gray-100 text-gray-700 hover:bg-gray-200')}
+            className={"p-2 rounded-full transition-colors focus:outline-none " + (isDark ? 'text-yellow-300 hover:bg-[#2a2d2e]' : 'text-[#5f6368] hover:bg-[#f1f3f4]')}
             title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
             onClick={() => setIsDark(!isDark)}
             aria-label="Toggle dark mode"
@@ -156,86 +164,170 @@ export default function StaticGallery() {
               <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" stroke="currentColor" strokeWidth="2"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" strokeWidth="2"/></svg>
             )}
           </button>
-          {/* GitHub Repo Icon (circle) */}
+          {/* GitHub */}
           <a
             href="https://github.com/833M0L3/cct-memes"
             target="_blank"
             rel="noopener noreferrer"
-            className={"p-2 rounded-full transition-colors ml-1 flex items-center justify-center " + (isDark ? 'bg-[#23272b] hover:bg-[#30363d] text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-800')}
+            className={"p-2 rounded-full transition-colors flex items-center justify-center " + (isDark ? 'text-[#e3e3e3] hover:bg-[#2a2d2e]' : 'text-[#5f6368] hover:bg-[#f1f3f4]')}
             title="View GitHub Repo"
-            style={{ width: 36, height: 36 }}
           >
             <Github size={20} />
           </a>
-          {/* Profile Icon */}
+          {/* Profile avatar */}
           <a
             href="https://github.com/bimal1412"
             target="_blank"
             rel="noopener noreferrer"
-            className={"p-1 rounded-full transition-colors ml-2 " + (isDark ? 'hover:bg-[#23272b]' : 'hover:bg-gray-100')}
+            className="p-0.5 rounded-full ml-1"
             title="Go to GitHub Profile"
           >
             <img 
               src="https://avatars.githubusercontent.com/u/59522309?v=4" 
               alt="Profile" 
-              className="w-8 h-8 rounded-full border border-gray-200 object-cover shadow-sm"
+              className="w-8 h-8 rounded-full border-2 border-[#dadce0] object-cover"
             />
           </a>
         </div>
       </header>
 
-      {/* Sidebar Drawer */}
-      {isSidebarOpen && (
-        <div className="fixed inset-0 z-[200] flex">
-          {/* Backdrop */}
-          <div 
-            className="absolute inset-0 bg-black/40 transition-opacity" 
-            onClick={() => setIsSidebarOpen(false)}
-          />
-          {/* Drawer */}
-          <div className="relative w-72 max-w-[80%] bg-white h-full shadow-2xl flex flex-col py-6 animate-slide-left z-10">
-            <div className="px-6 pb-6 mb-2">
-              <span className="text-[22px] font-medium text-[#5f6368]" style={{ fontFamily: "'Product Sans', Arial, sans-serif" }}>CCT Memories</span>
+      {/* Mobile search bar — shown below header on small screens */}
+      {(activeTab === 'photos' || activeTab === 'screenshots') && (
+        <div className={"md:hidden px-3 py-2 border-b " + (isDark ? 'bg-[#181a1b] border-[#2a2d2e]' : 'bg-white border-[#e8eaed]')}>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="text-[#5f6368]" size={16} />
             </div>
-            
-            <div 
-              className={`flex items-center gap-5 px-6 py-3 cursor-pointer rounded-r-full mr-4 transition-colors ${activeTab === 'photos' ? 'bg-[#e8f0fe] text-[#1a73e8]' : 'text-[#3c4043] hover:bg-[#f1f3f4]'}`}
-              onClick={() => { setActiveTab('photos'); setIsSidebarOpen(false); }}
-            >
-              <ImageIcon size={22} className={activeTab === 'photos' ? 'text-[#1a73e8]' : 'text-[#5f6368]'} />
-              <span className={`text-[14px] ${activeTab === 'photos' ? 'font-medium' : 'font-normal'}`}>Photos</span>
-            </div>
-            
-            <div 
-              className={`flex items-center gap-5 px-6 py-3 cursor-pointer rounded-r-full mr-4 transition-colors ${activeTab === 'about' ? 'bg-[#e8f0fe] text-[#1a73e8]' : 'text-[#3c4043] hover:bg-[#f1f3f4]'}`}
-              onClick={() => { setActiveTab('about'); setIsSidebarOpen(false); }}
-            >
-              <Info size={22} className={activeTab === 'about' ? 'text-[#1a73e8]' : 'text-[#5f6368]'} />
-              <span className={`text-[14px] ${activeTab === 'about' ? 'font-medium' : 'font-normal'}`}>About</span>
-            </div>
+            <input
+              type="text"
+              placeholder="Search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className={"w-full rounded-full py-2 pl-9 pr-4 text-sm focus:outline-none transition-all " + (isDark ? 'bg-[#2a2d2e] text-[#e3e3e3] placeholder-[#9aa0a6]' : 'bg-[#f1f3f4] text-[#3c4043] placeholder-[#5f6368]')}
+            />
           </div>
         </div>
       )}
 
-      <div className="flex h-[calc(100vh-64px)] overflow-hidden">
-        {/* Main Content */}
-        <main className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 pb-20 relative" id="scroll-container">
-          {activeTab === 'photos' ? (
+      {/* ── Permanent sidebar (desktop only, always visible) ─────────── */}
+      <aside className={"hidden md:flex fixed inset-y-0 left-0 z-40 flex-col w-64 border-r " + (isDark ? 'bg-[#181a1b] border-[#2a2d2e]' : 'bg-white border-[#e8eaed]')}>
+        {/* Sidebar header — same height as main header so they align */}
+        <div className={"flex items-center gap-2 px-4 h-[57px] border-b flex-shrink-0 " + (isDark ? 'border-[#2a2d2e]' : 'border-[#e8eaed]')}>
+          <svg viewBox="0 0 40 40" style={{width:'1.8rem',height:'1.8rem',flexShrink:0}}>
+            <path d="M20,20 L20,0 C9,0 0,9 0,20 Z" fill="#EA4335" />
+            <path d="M20,20 L40,20 C40,9 31,0 20,0 Z" fill="#4285F4" />
+            <path d="M20,20 L20,40 C31,40 40,31 40,20 Z" fill="#34A853" />
+            <path d="M20,20 L0,20 C0,31 9,40 20,40 Z" fill="#FBBC05" />
+          </svg>
+          <span className={"text-[18px] font-medium tracking-[-0.3px] " + (isDark ? 'text-[#e3e3e3]' : 'text-[#5f6368]')} style={{fontFamily:"'Product Sans',Arial,sans-serif"}}>CCT Memories</span>
+        </div>
+        {/* Nav items */}
+        <div className="flex flex-col gap-0.5 flex-1 pt-2 overflow-y-auto">
+          {[
+            { id: 'photos', label: 'Memes' },
+            { id: 'screenshots', label: 'Screenshot Memories' },
+          ].map(({ id, label }) => (
+            <div
+              key={id}
+              className={`flex items-center gap-4 pl-6 pr-4 py-3 mr-3 cursor-pointer rounded-r-full transition-colors ${
+                activeTab === id
+                  ? (isDark ? 'bg-[#394457] text-[#8ab4f8]' : 'bg-[#e8f0fe] text-[#1a73e8]')
+                  : (isDark ? 'text-[#e3e3e3] hover:bg-[#2a2d2e]' : 'text-[#3c4043] hover:bg-[#f1f3f4]')
+              }`}
+              onClick={() => setActiveTab(id)}
+            >
+              <ImageIcon size={20} className={activeTab === id ? (isDark ? 'text-[#8ab4f8]' : 'text-[#1a73e8]') : (isDark ? 'text-[#9aa0a6]' : 'text-[#5f6368]')} />
+              <span className={`text-[14px] ${activeTab === id ? 'font-medium' : 'font-normal'}`}>{label}</span>
+            </div>
+          ))}
+        </div>
+        <div className="pb-6 pr-3">
+          <div
+            className={`flex items-center gap-4 pl-6 py-3 cursor-pointer rounded-r-full transition-colors ${
+              activeTab === 'about'
+                ? (isDark ? 'bg-[#394457] text-[#8ab4f8]' : 'bg-[#e8f0fe] text-[#1a73e8]')
+                : (isDark ? 'text-[#e3e3e3] hover:bg-[#2a2d2e]' : 'text-[#3c4043] hover:bg-[#f1f3f4]')
+            }`}
+            onClick={() => setActiveTab('about')}
+          >
+            <Info size={20} className={activeTab === 'about' ? (isDark ? 'text-[#8ab4f8]' : 'text-[#1a73e8]') : (isDark ? 'text-[#9aa0a6]' : 'text-[#5f6368]')} />
+            <span className={`text-[14px] ${activeTab === 'about' ? 'font-medium' : 'font-normal'}`}>About</span>
+          </div>
+        </div>
+      </aside>
+
+      {/* ── Mobile drawer sidebar (overlay, only on small screens) ─────── */}
+      {isSidebarOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-[199] bg-black/30"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+          <aside className={"md:hidden fixed inset-y-0 left-0 z-[200] flex flex-col shadow-2xl h-full w-72 sm:w-80 transition-transform duration-300 " + (isDark ? 'bg-[#202124]' : 'bg-white')}>
+            {/* Close button for sidebar (mobile/desktop) */}
+            <button
+              className={"absolute top-3 right-3 p-2 rounded-full transition-colors " + (isDark ? 'hover:bg-[#2a2d2e] text-[#9aa0a6]' : 'hover:bg-[#f1f3f4] text-[#5f6368]')}
+              onClick={() => setIsSidebarOpen(false)}
+              aria-label="Close sidebar"
+            >
+              <X size={24} />
+            </button>
+            <div className="px-6 pt-10 pb-4 mb-1 flex flex-col gap-1">
+              <span className={"text-[22px] font-medium " + (isDark ? 'text-[#e3e3e3]' : 'text-[#5f6368]')} style={{ fontFamily: "'Product Sans', Arial, sans-serif" }}>CCT Memories</span>
+              <span className={"text-[12px] " + (isDark ? 'text-[#9aa0a6]' : 'text-[#80868b]')}>{MEME_FILES.length + SCREENSHOT_FILES.length} total items</span>
+            </div>
+            <div className="flex flex-col gap-0.5 flex-1">
+              {[
+                { id: 'photos', label: 'Memes' },
+                { id: 'screenshots', label: 'Screenshot Memories' },
+              ].map(({ id, label }) => (
+                <div
+                  key={id}
+                  className={`flex items-center gap-4 pl-6 pr-4 py-3 mr-3 cursor-pointer rounded-r-full transition-colors ${
+                    activeTab === id
+                      ? (isDark ? 'bg-[#394457] text-[#8ab4f8]' : 'bg-[#e8f0fe] text-[#1a73e8]')
+                      : (isDark ? 'text-[#e3e3e3] hover:bg-[#2a2d2e]' : 'text-[#3c4043] hover:bg-[#f1f3f4]')
+                  }`}
+                  onClick={() => { setActiveTab(id); setIsSidebarOpen(false); }}
+                >
+                  <ImageIcon size={20} className={activeTab === id ? (isDark ? 'text-[#8ab4f8]' : 'text-[#1a73e8]') : (isDark ? 'text-[#9aa0a6]' : 'text-[#5f6368]')} />
+                  <span className={`text-[14px] ${activeTab === id ? 'font-medium' : 'font-normal'}`}>{label}</span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-auto pb-6 pr-3">
+              <div 
+                className={`flex items-center gap-4 pl-6 py-3 cursor-pointer rounded-r-full transition-colors ${
+                  activeTab === 'about'
+                    ? (isDark ? 'bg-[#394457] text-[#8ab4f8]' : 'bg-[#e8f0fe] text-[#1a73e8]')
+                    : (isDark ? 'text-[#e3e3e3] hover:bg-[#2a2d2e]' : 'text-[#3c4043] hover:bg-[#f1f3f4]')
+                }`}
+                onClick={() => { setActiveTab('about'); setIsSidebarOpen(false); }}
+              >
+                <Info size={20} className={activeTab === 'about' ? (isDark ? 'text-[#8ab4f8]' : 'text-[#1a73e8]') : (isDark ? 'text-[#9aa0a6]' : 'text-[#5f6368]')} />
+                <span className={`text-[14px] ${activeTab === 'about' ? 'font-medium' : 'font-normal'}`}>About</span>
+              </div>
+            </div>
+          </aside>
+        </>
+      )}
+
+      {/* Content area — offset on desktop to sit beside the permanent sidebar */}
+      <div className="md:ml-64 flex min-h-[calc(100vh-56px)] overflow-hidden">
+        <main className="flex-1 overflow-y-auto px-1 sm:px-3 lg:px-5 xl:px-8 pb-20 sm:pb-8" id="scroll-container">
+          {activeTab === 'photos' || activeTab === 'screenshots' ? (
             <>
-              {/* Group Header */}
-              <div className={
-                `sticky top-0 backdrop-blur-sm z-10 pt-4 pb-3 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 flex items-center justify-between ` +
-                (isDark ? 'bg-[#23272b]/95' : 'bg-white/95')
-              }>
-                <h2 className={"text-[15px] font-medium " + (isDark ? 'text-[#e3e3e3]' : 'text-[#3c4043]')}>CCT Batch 2021</h2>
+              {/* Group Header (tight, no extra space) */}
+              <div className="flex items-center justify-between px-2 sm:px-4 lg:px-6 xl:px-8 mt-2 mb-2">
+                <h2 className={"text-[15px] font-medium " + (isDark ? 'text-[#e3e3e3]' : 'text-[#3c4043]')}>{activeTab === 'photos' ? 'CCT Memes' : 'Screenshot Memories'}</h2>
                 <div className={"text-[13px] " + (isDark ? 'text-[#b0b0b0]' : 'text-[#5f6368]')}>
-                   {filteredFiles.length} items
+                   {albumFiles.length} items
                 </div>
               </div>
 
               {/* Grid Layout (Dense, square aspect ratios) */}
-              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-1 mt-1">
-                {filteredFiles.map((file, idx) => (
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 gap-1 mt-2">
+                {albumFiles.map((file, idx) => (
                   <div 
                     key={idx} 
                     className="group relative bg-[#f1f3f4] overflow-hidden cursor-pointer"
@@ -245,7 +337,7 @@ export default function StaticGallery() {
                     {isVideo(file) ? (
                       <>
                         <video
-                          src={`${import.meta.env.BASE_URL}memes/${encodeURIComponent(file)}`}
+                          src={`${import.meta.env.BASE_URL}${activeTab === 'photos' ? 'memes' : 'ss'}/${encodeURIComponent(file)}`}
                           className="w-full h-full object-cover"
                           muted
                           loop
@@ -259,15 +351,13 @@ export default function StaticGallery() {
                       </>
                     ) : (
                       <LazyImage
-                        src={`${import.meta.env.BASE_URL}memes/${encodeURIComponent(file)}`}
+                        src={`${import.meta.env.BASE_URL}${activeTab === 'photos' ? 'memes' : 'ss'}/${encodeURIComponent(file)}`}
                         alt={file}
                         className="w-full h-full object-cover"
                       />
                     )}
-                    
                     {/* Hover overlay */}
                     <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                    
                     {/* Select Checkbox icon */}
                     <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                       <div className="bg-white/30 hover:bg-white rounded-full p-0.5 border-2 border-white text-transparent hover:text-[#1a73e8] transition-colors shadow-sm">
@@ -278,7 +368,7 @@ export default function StaticGallery() {
                 ))}
               </div>
 
-              {filteredFiles.length === 0 && (
+              {albumFiles.length === 0 && (
                 <div className="flex flex-col items-center justify-center h-64 text-[#5f6368]">
                   <Search size={48} className="mb-4 text-[#dadce0]" />
                   <p>No photos found</p>
@@ -286,28 +376,41 @@ export default function StaticGallery() {
               )}
             </>
           ) : (
-            <div className="min-h-full w-full flex flex-col items-center justify-center p-4 sm:p-8 lg:p-12">
-              <div className="max-w-3xl w-full bg-white border border-gray-200 rounded-3xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden">
-                <div className="bg-[#f8f9fa] border-b border-gray-100 p-8 sm:p-12 flex flex-col items-center justify-center">
-                  <div className="w-20 h-20 relative flex items-center justify-center mb-6">
-                    <svg viewBox="0 0 40 40" className="w-20 h-20 drop-shadow-sm">
+            <div className="w-full">
+              {/* About Header Bar (matches gallery) */}
+              <div className={
+                `sticky top-0 backdrop-blur-sm z-10 pt-4 pb-3 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 flex items-center justify-between ` +
+                (isDark ? 'bg-[#23272b]/95' : 'bg-white/95')
+              }>
+                <h2 className={"text-[15px] font-medium " + (isDark ? 'text-[#e3e3e3]' : 'text-[#3c4043]')}>About CCT Memories</h2>
+                <div className={"text-[13px] " + (isDark ? 'text-[#b0b0b0]' : 'text-[#5f6368]')}>
+                  v1.0.0
+                </div>
+              </div>
+              {/* About Content (matches gallery padding/colors) */}
+              <div className={
+                `w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 ` +
+                (isDark ? 'text-[#e3e3e3]' : 'text-[#3c4043]')
+              }>
+                <div className="flex flex-col items-center mb-8">
+                  <div className="w-16 h-16 relative flex items-center justify-center mb-4">
+                    <svg viewBox="0 0 40 40" className="w-16 h-16 drop-shadow-sm">
                       <path d="M20,20 L20,0 C9,0 0,9 0,20 Z" fill="#EA4335" />
                       <path d="M20,20 L40,20 C40,9 31,0 20,0 Z" fill="#4285F4" />
                       <path d="M20,20 L20,40 C31,40 40,31 40,20 Z" fill="#34A853" />
                       <path d="M20,20 L0,20 C0,31 9,40 20,40 Z" fill="#FBBC05" />
                     </svg>
                   </div>
-                  <h1 className="text-3xl sm:text-4xl font-medium text-center text-[#1a73e8]" style={{ fontFamily: "'Product Sans', Arial, sans-serif" }}>
-                    About CCT Memories
+                  <h1 className="text-2xl sm:text-3xl font-medium text-center text-[#1a73e8] dark:text-[#8ab4f8]" style={{ fontFamily: "'Product Sans', Arial, sans-serif" }}>
+                    CCT Memories
                   </h1>
                 </div>
-                
-                <div className="p-8 sm:p-12 text-[#3c4043] space-y-6 text-base sm:text-lg leading-relaxed">
+                <div className="space-y-6 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto">
                   <p>
-                    This is the webpage made to preserve memories of Bimal Dhital during his time attending CCT college BSc CSIT course.
+                    This is the webpage made to preserve memories of Bimal during his bachelor's undergraduate days attending computer science in CCT college.
                   </p>
                   <p>
-                    Throughout the years from 2021 onwards, Bimal and the entire Batch of 2021 have shared countless moments of joy, late-night coding sessions, exam struggles, and unforgettable latenight discord call sessions. This gallery serves as a nostalgic archive, a time capsule of those chaotic but beautiful college days at Central Campus of Technology.
+                    Throughout the years from 2021 onwards, Bimal and the entire Batch of 2021 have shared countless moments of joy, late-night coding sessions, exam struggles, and unforgettable late-night discord call sessions. This gallery serves as a nostalgic archive, a time capsule of those chaotic but beautiful college days.
                   </p>
                   <p>
                     From surviving rigorous lab assignments to the spontaneous inside jokes shared among friends, every meme and photo here holds a story. Feel free to browse, laugh, and reminisce about the good old days.
@@ -331,7 +434,7 @@ export default function StaticGallery() {
           {/* Top Controls */}
           <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center bg-gradient-to-b from-black/50 to-transparent z-10">
             <span className="text-white/80 font-medium text-sm drop-shadow-md">
-              {filteredFiles.indexOf(selectedFile) + 1} / {filteredFiles.length}
+              {albumFiles.indexOf(selectedFile) + 1} / {albumFiles.length}
             </span>
             <button 
               className="text-white hover:text-gray-300 p-2 rounded-full hover:bg-white/10 transition-colors"
@@ -358,7 +461,7 @@ export default function StaticGallery() {
             >
               {isVideo(selectedFile) ? (
                 <video
-                  src={`${import.meta.env.BASE_URL}memes/${encodeURIComponent(selectedFile)}`}
+                  src={`${import.meta.env.BASE_URL}${activeTab === 'screenshots' ? 'ss' : 'memes'}/${encodeURIComponent(selectedFile)}`}
                   controls
                   autoPlay
                   className="w-full h-full max-h-screen object-contain"
@@ -380,7 +483,7 @@ export default function StaticGallery() {
                     contentClass="!w-full !h-full flex items-center justify-center"
                   >
                     <img
-                      src={`${import.meta.env.BASE_URL}memes/${encodeURIComponent(selectedFile)}`}
+                      src={`${import.meta.env.BASE_URL}${activeTab === 'screenshots' ? 'ss' : 'memes'}/${encodeURIComponent(selectedFile)}`}
                       alt={selectedFile}
                       className="w-full h-full max-w-full max-h-[100dvh] object-contain pointer-events-none"
                     />
